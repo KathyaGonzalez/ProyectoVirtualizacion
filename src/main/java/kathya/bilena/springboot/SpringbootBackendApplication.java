@@ -44,36 +44,40 @@ public class SpringbootBackendApplication extends Thread implements CommandLineR
 				System.out.println("------------------------------------------------------------------------------------------------------");
 				try{
 					int peticiones = 2;
-					URL url = new URL("https://random-data-api.com/api/v2/users?size=" + peticiones);
-					HttpURLConnection conn= (HttpURLConnection) url.openConnection();
-					conn.setRequestMethod("GET");
-					conn.connect();
-					int responseCode = conn.getResponseCode();
-					if (responseCode != 200){
-						throw new RuntimeException("Ocurrió un error: "+ responseCode);
-					}else{
-						StringBuilder informationString = new StringBuilder();
-						Scanner scanner = new Scanner(url.openStream());
-						while(scanner.hasNext()){
-							informationString.append(scanner.nextLine());
-						}
-						scanner.close();
-						JSONArray jsonArray = new JSONArray(informationString.toString());
-						for(int x=0; x< peticiones; x++){
-							JSONObject jsonObject = jsonArray.getJSONObject(x);
-							String nombre = jsonObject.getString("first_name") + " " + jsonObject.getString("last_name");
-							System.out.println("nombre: " + nombre);
-							String correo = jsonObject.getString("email");
-							System.out.println("correo: " + correo);
-							String empleo = jsonObject.getJSONObject("employment").getString("title");
-							System.out.println("empleo: " + empleo);
-							Usuario usuario = new Usuario();
-							usuario.setNombre(nombre);
-							usuario.setCorreo(correo);
-							usuario.setEmpleo(empleo);
-							usuarioRepository.save(usuario);
-							Thread.sleep(1000);
-							System.out.println("------------------------------------------------------------------------------------------------------");
+					int ronda = 3;
+					while (ronda > 0){
+						ronda -= 1;
+						URL url = new URL("https://random-data-api.com/api/v2/users?size=" + peticiones);
+						HttpURLConnection conn= (HttpURLConnection) url.openConnection();
+						conn.setRequestMethod("GET");
+						conn.connect();
+						int responseCode = conn.getResponseCode();
+						if (responseCode != 200){
+							throw new RuntimeException("Ocurrió un error: "+ responseCode);
+						}else{
+							StringBuilder informationString = new StringBuilder();
+							Scanner scanner = new Scanner(url.openStream());
+							while(scanner.hasNext()){
+								informationString.append(scanner.nextLine());
+							}
+							scanner.close();
+							JSONArray jsonArray = new JSONArray(informationString.toString());
+							for(int x=0; x< peticiones; x++){
+								JSONObject jsonObject = jsonArray.getJSONObject(x);
+								String nombre = jsonObject.getString("first_name") + " " + jsonObject.getString("last_name");
+								System.out.println("nombre: " + nombre);
+								String correo = jsonObject.getString("email");
+								System.out.println("correo: " + correo);
+								String empleo = jsonObject.getJSONObject("employment").getString("title");
+								System.out.println("empleo: " + empleo);
+								Usuario usuario = new Usuario();
+								usuario.setNombre(nombre);
+								usuario.setCorreo(correo);
+								usuario.setEmpleo(empleo);
+								usuarioRepository.save(usuario);
+								Thread.sleep(500);
+								System.out.println("------------------------------------------------------------------------------------------------------");
+							}
 						}
 					}
 				}catch(Exception e){
